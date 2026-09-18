@@ -9,13 +9,37 @@ per RFC 9421 using the existing :class:`~django_aauth.signing.RequestVerifier`.
 
 from __future__ import annotations
 
+import dataclasses
+import logging
 import re
 
 from rest_framework import authentication, exceptions
 
 from .signing import RequestVerifier
 
+logger = logging.getLogger(__name__)
+
+# Matches the first keyid="..." parameter in a Signature-Input header.
+# The AAuth draft currently assumes a single signature per request; if a
+# future revision requires multi-signature resource-server requests, this
+# will need to iterate all sig*= labels instead of taking the first match.
 _KEYID_RE = re.compile(r'keyid="([^"]*)"')
+
+
+@dataclasses.dataclass(frozen=True)
+class AAuthAgent:
+    """The ``request.user`` DRF sees after a successful AAuth verification.
+
+    Satisfies the "user" half of DRF's authentication contract (an
+    ``is_authenticated`` attribute) so this backend composes with DRF's
+    built-in permission classes such as ``IsAuthenticated``.
+    """
+
+    agent_id: str
+    is_authenticated: bool = True
+
+    def __str__(self) -> str:
+        return self.agent_id
 
 
 class _VerifiableRequest:
@@ -63,10 +87,11 @@ class AAuthAuthentication(authentication.BaseAuthentication):
         verifier = RequestVerifier(key_id, public_key)
         try:
             results = verifier.verify(_VerifiableRequest(request))
-        except Exception as exc:
-            raise exceptions.AuthenticationFailed(f"AAuth signature verification failed: {exc}")
+        except Exception:
+            logger.warning("AAuth signature verification failed for key id %r", key_id, exc_info=True)
+            raise exceptions.AuthenticationFailed("AAuth signature verification failed")
 
         if not results:
             raise exceptions.AuthenticationFailed("no verifiable AAuth signature found")
 
-        return (key_id, results)
+        return (AAuthAgent(agent_id=key_id), results)
