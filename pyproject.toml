@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "django-aauth"
+version = "0.1.0"
+description = "Django/DRF integration for the AAuth agent authentication/authorization protocol"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Brad Zeitner" }]
+dependencies = [
+    "cryptography>=42",
+    "pyjwt>=2.8",
+    "http-message-signatures>=2.0",
+    "typing_extensions>=4.7",
+]
+
+[project.optional-dependencies]
+drf = ["djangorestframework>=3.14"]
+test = ["pytest>=8", "requests>=2.31", "django>=4.2", "djangorestframework>=3.14"]
+
+[tool.setuptools.packages.find]
+include = ["django_aauth*"]
