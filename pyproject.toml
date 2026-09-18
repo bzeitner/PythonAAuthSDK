@@ -18,7 +18,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest>=8", "requests>=2.31"]
+drf = ["djangorestframework>=3.14"]
+test = ["pytest>=8", "requests>=2.31", "django>=4.2", "djangorestframework>=3.14"]
 
 [tool.setuptools.packages.find]
 include = ["django_aauth*"]

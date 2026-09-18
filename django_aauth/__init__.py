@@ -9,3 +9,7 @@ __all__ = [
     "RequestVerifier",
     "StaticKeyResolver",
 ]
+
+# `django_aauth.authentication` is intentionally not imported here: it
+# requires Django/DRF to be installed, which the core signing/identity
+# modules do not.
