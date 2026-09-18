@@ -3,8 +3,8 @@ RFC 9421 signature over a sample HTTP request."""
 
 import requests
 
-from aauth import RequestSigner, RequestVerifier, generate_identity
-from aauth.identity import verify_agent_token
+from django_aauth import RequestSigner, RequestVerifier, generate_identity
+from django_aauth.identity import verify_agent_token
 
 
 def test_mint_and_verify_agent_token():
